@@ -1,24 +1,24 @@
 {
-  "name": "saffo_backend_project",
+  "name": "cheatsheet",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A completed API using express.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JuanCabruja/FinalProject_backend.git"
-  },
-  "author": "Juan Francisco Cabruja",
+  "author": "Realvaz",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JuanCabruja/FinalProject_backend/issues"
-  },
-  "homepage": "https://github.com/JuanCabruja/FinalProject_backend#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "ramda": "^0.27.1"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.8",
+    "mongoose-unique-validator": "^2.0.3",
+    "ramda": "^0.27.1",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

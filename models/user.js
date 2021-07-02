@@ -4,13 +4,30 @@ const uniqueValidator = require("mongoose-unique-validator");
 let Schema = mongoose.Schema;
 
 const validRoles = {
-    values: ["ADMIN", "USER"],
+    values: ["ADMIN", "USER", "CREATOR"],
     message: "{VALUE} is not a valid role"
 };
+
+let addressSchema = new Schema({
+    city: { type: String },
+    street: { type: String },
+    houseNumber: { type: String },
+    zipCode: { type: String } 
+});
+
+let userInfoSchema = new Schema({
+    name: { type: String },
+    lastName: { type: String },
+    contactInfo: { 
+        phoneNumber: { type: String },
+        address: [ addressSchema ]
+    }
+});
 
 let userSchema = new Schema({
     username: {
         type: String,
+        unique: [true, "Username already exist, please try another"],
         required: [true, "Username is required"]
     },
     email: {
@@ -22,11 +39,22 @@ let userSchema = new Schema({
         type: String,
         required: [true, "Password is required"]
     },
+    avatar: {
+        data: Buffer,
+        contentType: String
+    },
+    description: {
+        type: String,
+    },
     role: {
-        // Not required if omitted
         type: String,
         default: "USER",
         enum: validRoles
+    },
+    paymentMethods: {
+        // TODO: DUDA, ¿COMO ORGANIZO PARA GUARDAR UNA TARJETA?
+    },
+    userInfo: { type: userInfoSchema 
     },
     active: {
         type: Boolean,
@@ -41,7 +69,6 @@ userSchema.methods.toJSON = function() {
 
     delete userObject.password;
     delete userObject.__v;
-
 
     return userObject;
 }

@@ -4,4 +4,4 @@ process.env.PORT = process.env.PORT || 3009;
 
 // una forma de generar una semilla lo suficientemente aleatoria es:
 // require("crypto").randomBytes(64).toString("hex");
-// process.env.SEED = process.env.SEED || "SECRET KEY";
+process.env.SEED = process.env.SEED || "SECRET KEY";

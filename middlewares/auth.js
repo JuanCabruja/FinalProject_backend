@@ -34,4 +34,23 @@ const verifyAdmin = (req, res, next) => {
   
   };
 
-module.exports = {verifyToken, verifyAdmin};
+
+  //TODO: Crearé momenténamente la función verifyCreator en esta página, luego quizá esto vaya a un archivo independiente.
+
+const verifyCreator = (req, res, next) => {
+  let token = req.get("authorization");
+  token = token && token.split(" ")[1];
+  const decoded = jwt.decode(token);
+  
+    if(decoded.user?.role !== "CREATOR") {
+      return res.status(403).json({
+        ok: false,
+        err: {message: "Forbidden"},
+      });
+    } else {
+      next();
+    }
+  
+  };
+
+module.exports = {verifyToken, verifyAdmin, verifyCreator};

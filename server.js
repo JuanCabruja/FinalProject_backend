@@ -1,13 +1,17 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
+const morgan = require("morgan");
 const app = express();
 
 // Antes de los endpoints, usamos los middlewares
 app.use(express.json());
 app.use(cors());
+app.use(morgan('dev'));
 
 app.use(require("./routes"));
+
+app.use('/public', express.static('public'));
 
 mongoose.connect("mongodb://localhost:27017/SAFFO", {
     useNewUrlParser: true,

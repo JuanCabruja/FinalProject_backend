@@ -5,9 +5,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-const User = require("../models/user");
+
 const Product = require("../models/Product");
 const Collection = require("../models/Collection");
+const User = require("../models/user");
+
+const upload = require('../libs/storage');
+
 const {verifyToken, verifyAdmin} = require("../middlewares/auth");
 
 router.get("/", async (req, res)  => {
@@ -164,6 +168,36 @@ router.get("/:username", async (req, res)  => {
 
 });
 
+// Modificación del avatar del usuario. 
+// TODO: No sé por qué me está dando este error
+
+router.put("/:username/avatar_update", upload.single("avatar"),  (req, res) => {
+    let usernameRaw = req.params.username;
+    let username = usernameRaw.toLowerCase();
+    let body = req.body;
+
+    const url = req.protocol + '://' + req.get('host');
+    const file = url + '/public/' + req.file.filename;
+   
+
+    // const file = req.file
+    // if (!file) {
+    //   const error = new Error('Please upload a file')
+    //   error.httpStatusCode = 400
+    //   return next(error)
+    // }
+    //   res.send(file)
+
+    const filter = { _id: body._id };
+
+    User.updateOne(filter, {avatar: file}, (err, user) => {
+        if (err) {
+            res.status(400).json({ok: false, err});
+        } else {
+            res.status(200).json({ok: true, user});
+        }
+    })
+
 // Modificación de los valores del usuario
 router.put("/:username/config", verifyToken, (req, res) => {
     let usernameRaw = req.params.username;
@@ -175,7 +209,7 @@ router.put("/:username/config", verifyToken, (req, res) => {
     //Supongo que esto tendré que hacerlo para todos los valores de los usuarios
     //TODO: Preguntarle a Jesús alguna posible forma de hacer un código mas limpio y genérico
 
-    User.updateOne({username: username}, 
+    User.findOneAndReplace({username: username}, 
         {username: newUsername, 
         email: body.email, 
         password:  bcrypt.hashSync(body.password, 10),
@@ -187,6 +221,29 @@ router.put("/:username/config", verifyToken, (req, res) => {
         }
     })
 
+    // User.updateOne({username: username}, 
+    //     {username: newUsername, 
+    //     email: body.email, 
+    //     password:  bcrypt.hashSync(body.password, 10),
+    //     }, (err, user) => {
+    //     if (err) {
+    //         res.status(400).json({ok: false, err});
+    //     } else {
+    //         res.status(200).json({ok: true, user});
+    //     }
+    // })
+
+})
+
+
+
+    // User.find({}, (err, user) => {
+    //     if (err) {
+    //         res.status(400).json({ok: false, err});
+    //     } else {
+    //         res.status(200).json({ok: true, user});
+    //     }
+    // })
 })
 
 router.delete("/:username/delete", verifyToken, (req, res) => {

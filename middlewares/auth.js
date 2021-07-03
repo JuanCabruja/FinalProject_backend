@@ -34,9 +34,6 @@ const verifyAdmin = (req, res, next) => {
   
   };
 
-
-  //TODO: Crearé momenténamente la función verifyCreator en esta página, luego quizá esto vaya a un archivo independiente.
-
 const verifyCreator = (req, res, next) => {
   let token = req.get("authorization");
   token = token && token.split(" ")[1];

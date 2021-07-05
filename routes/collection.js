@@ -25,10 +25,12 @@ router.post("/", verifyCreator, upload.array('collectionImages', 10),  (req, res
     const collection = new Collection({
         name: body.collectionName,
         supply: body.collectionSupply,
+        available: body.collectionSupply,
         price: body.collectionPrice,
         description: body.collectionDescription,
         author: body.author,
-        images: collectionFiles
+        images: collectionFiles,
+        available: body.collectionSupply
         // TODO: CATEGORIES NO ESTÁ IMPLEMENTADA TODAVía
     });
 
@@ -81,6 +83,19 @@ router.get("/", (req, res) => {
         
     });
 });
+
+// Query a Una colección
+router.get("/:collectionId", (req, res) => {
+    const collectionId = req.params.collectionId;
+
+    Collection.find( {_id: collectionId}, (err, collection) => {
+        if (err) {
+            res.status(400).json({ok: false, err, message: "collection not found"});
+        } else {
+            res.status(200).json({ok: true, collection})
+        }
+    })
+})
 
 // Query a todos los productos.
 router.get("/products", (req, res) => {

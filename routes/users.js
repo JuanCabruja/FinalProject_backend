@@ -118,7 +118,7 @@ router.get("/creators", async (req, res)  => {
 
     const count = await User.countDocuments();
      
-    User.find({role: "CREATOR"})
+    User.find({role: "CREATOR", active: true})
     .skip(( page - 1) * PAGE_SIZE)
     .limit(PAGE_SIZE) 
     .exec((error, users) => {
@@ -132,11 +132,13 @@ router.get("/creators", async (req, res)  => {
 });
 
 // Request de info usuario y pobla el campo objetos.
+// TODO: Aquí puedo poner una discriminación que si el usuario es creador le envíe solo las colecciones y cuantas están disponibles
 router.get("/:username", async (req, res)  => {
 
     let usernameRaw = req.params.username;
     let username = usernameRaw.toLowerCase();
 
+    // Fetch para usuarios. 
     User.findOne({username: username})
     .exec((error, user) => {
         if(error) {
@@ -147,7 +149,7 @@ router.get("/:username", async (req, res)  => {
         } else if ( user.active == false){
             res.status(404).json({ok: false, message: "This user was deleted"})
         }
-        else {
+        else if ( user.role === "USER" ){
             let id = user._id;
             Product.find({product_Owner: id}, (err, products) => {
                 if (err) {
@@ -163,15 +165,22 @@ router.get("/:username", async (req, res)  => {
                     })
                 }
             })
+        } else if (user.role === "CREATOR") {
+            let id = user._id;
+            Collection.find({author: id}, (err, collection) => {
+                if (err) {
+                    res.status(400).json({ok: false, err});
+                } else {
+                    res.status(200).json({ok: true, user, collection});
+                }
+            })
         }
     })
 
 });
 
-// Modificación del avatar del usuario. 
-// TODO: No sé por qué me está dando este error
-
-router.put("/:username/avatar_update", upload.single("avatar"),  (req, res) => {
+// Modificación del avatar del usuario.
+router.put("/:username/avatar_update", verifyToken, upload.single("avatar"),  (req, res) => {
     let usernameRaw = req.params.username;
     let username = usernameRaw.toLowerCase();
     let body = req.body;
@@ -197,6 +206,7 @@ router.put("/:username/avatar_update", upload.single("avatar"),  (req, res) => {
             res.status(200).json({ok: true, user});
         }
     })
+})
 
 // Modificación de los valores del usuario
 router.put("/:username/config", verifyToken, (req, res) => {
@@ -209,19 +219,7 @@ router.put("/:username/config", verifyToken, (req, res) => {
     //Supongo que esto tendré que hacerlo para todos los valores de los usuarios
     //TODO: Preguntarle a Jesús alguna posible forma de hacer un código mas limpio y genérico
 
-    User.findOneAndReplace({username: username}, 
-        {username: newUsername, 
-        email: body.email, 
-        password:  bcrypt.hashSync(body.password, 10),
-        }, (err, user) => {
-        if (err) {
-            res.status(400).json({ok: false, err});
-        } else {
-            res.status(200).json({ok: true, user});
-        }
-    })
-
-    // User.updateOne({username: username}, 
+    // User.findOneAndReplace({username: username}, 
     //     {username: newUsername, 
     //     email: body.email, 
     //     password:  bcrypt.hashSync(body.password, 10),
@@ -233,25 +231,23 @@ router.put("/:username/config", verifyToken, (req, res) => {
     //     }
     // })
 
-})
-
-
-
-    // User.find({}, (err, user) => {
-    //     if (err) {
-    //         res.status(400).json({ok: false, err});
-    //     } else {
-    //         res.status(200).json({ok: true, user});
-    //     }
-    // })
+    User.updateOne({username: username}, 
+        {username: newUsername, 
+        email: body.email, 
+        password:  bcrypt.hashSync(body.password, 10),
+        }, (err, user) => {
+        if (err) {
+            res.status(400).json({ok: false, err});
+        } else {
+            res.status(200).json({ok: true, user});
+        }
+    }) 
 })
 
 router.delete("/:username/delete", verifyToken, (req, res) => {
     
     let usernameRaw = req.params.username;
     let username = usernameRaw.toLowerCase();
-
-    let body = req.body;
 
     User.updateOne({username: username}, {active: false}, (err, user) => {
         if (err) {

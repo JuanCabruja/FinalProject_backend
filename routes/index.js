@@ -8,5 +8,6 @@ app.use("/login", require("./login"));
 app.use("/collection", require("./collection"));
 app.use("/category", require("./category"));
 app.use("/session", require("./session"));
+app.use("/buysell", require("./buySell"));
 
 module.exports = app;

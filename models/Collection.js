@@ -20,6 +20,10 @@ let collectionSchema = new Schema({
         type: Number, 
         required: [true, "Collection supply amount is needed"]
     },
+    available: {
+        type: Number, 
+        required: [true]
+    },
     price: {
         type: Number, 
         required: [true, "Initial price is required"]

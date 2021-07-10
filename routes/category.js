@@ -20,4 +20,16 @@ router.post("/", (req, res) => {
     });
 })
 
+// Categories para la creación de una colección
+router.get("/", (req, res) => {
+    
+    Category.find({}, (err, categories) => {
+        if ( err ) {
+            res.status(400).json({ok: false, error});
+        } else {
+            res.status(201).json({ok: true, categories})
+        }
+    })
+})
+
 module.exports = router;

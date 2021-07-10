@@ -54,7 +54,8 @@ let userSchema = new Schema({
     paymentMethods: {
         // TODO: DUDA, ¿COMO ORGANIZO PARA GUARDAR UNA TARJETA?
     },
-    userInfo: { type: userInfoSchema 
+    userInfo: { 
+        type: userInfoSchema 
     },
     active: {
         type: Boolean,

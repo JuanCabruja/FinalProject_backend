@@ -17,13 +17,14 @@ const {verifyToken} = require("../middlewares/auth");
 
 // Esto irá asumo después del procesado del pago. 
 // Aunque también podría ser que esto sea un fetch a la iniciación del proceso de compra y venta. 
+//TODO: Terminar de gestionar este concepto de TODOs
+
 router.post('/collections/:collectionId', verifyToken, (req, res) => {
 
     let body = req.body
     let userBuyer = body.userBuyer; 
-    let userSeller = body.userSeller;  // No tendría por qué ser todo el objeto xq en relaidad no basta con el id 
+    let userSeller = body.userSeller;  
     let price = body.price; 
-    let author = body.author
 
     let parentCollection = body.parentCollection
 
@@ -31,7 +32,7 @@ router.post('/collections/:collectionId', verifyToken, (req, res) => {
         if  (err) {
             res.status(400).json({ok: false, error});
         } else if ( product === null) {
-            res.status(400).json({ok: false, message: "all product have been sold"}) 
+            res.status(400).json({ok: false, message: "all products have been sold"}) 
         } else { 
             const order = new buy_Sell({
                 user_buyer: userBuyer, 
@@ -43,7 +44,7 @@ router.post('/collections/:collectionId', verifyToken, (req, res) => {
             })
             order.save((err, savedOrder) => {
                 if (err) {
-                    
+
                     res.status(400).json({ok: false, error});
 
                 } else {
@@ -56,22 +57,13 @@ router.post('/collections/:collectionId', verifyToken, (req, res) => {
                             } else {
                             
                                 res.status(200).json({ok: true, product, savedOrder, newProductStatus})
+
                             }
-                          
                         })
-                    
                 }
             })
-
-            
-
-
-
         }
-         
-
     })
-
 })
 
 module.exports = router;

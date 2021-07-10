@@ -9,5 +9,6 @@ app.use("/collection", require("./collection"));
 app.use("/category", require("./category"));
 app.use("/session", require("./session"));
 app.use("/buysell", require("./buySell"));
+app.use("/market", require("./market"));
 
 module.exports = app;

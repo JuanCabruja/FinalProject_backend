@@ -10,6 +10,8 @@ const Product = require("../models/Product");
 const Collection = require("../models/Collection");
 const {verifyToken, verifyAdmin} = require("../middlewares/auth");
 
-
+router.get("/", (req, res) => {
+    //Van a tener que hacer aquí un GET de búsqueda 
+})
 
 module.exports = router;

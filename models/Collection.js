@@ -37,9 +37,9 @@ let collectionSchema = new Schema({
         required: [true, "Collection description is required"]
     },
     author: {
-        type: Schema.ObjectId, ref: "User"
+        type: Schema.ObjectId, ref: "User",
+        required: [true, "an author is needed"]
     },
-    // TODO: Por el momento dejo la relación de categoría abierta hasta revisarla
     categories: [{type: Schema.ObjectId, ref: "category"}] 
 });
 

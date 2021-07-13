@@ -26,7 +26,7 @@ let productSchema = new Schema({
     },
     productReSaleImages: {
         type: Array
-        
+    
     },
     productNumberInCollection: {
         type: Number, 

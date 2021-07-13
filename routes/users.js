@@ -146,7 +146,7 @@ router.get("/:username", async (req, res) => {
         } else {
           Collection.populate(
             products,
-            { path: "parentCollection", select: "images" },
+            { path: "parentCollection"},
             (err, products) => {
               if (err) {
                 res.status(400).json({ ok: false, err });

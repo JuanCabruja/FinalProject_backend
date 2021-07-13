@@ -1,9 +1,12 @@
+const mongoose = require("mongoose");
+
 const express = require("express");
 const router = express.Router();
 
 const Collection = require("../models/Collection");
 const User = require("../models/user");
 const Product = require("../models/Product");
+const category = require("../models/Category");
 
 const upload = require("../libs/storage");
 
@@ -39,12 +42,12 @@ router.post(
       images: collectionFiles,
       available: body.collectionSupply,
       description: body.description,
-      categories: body.categories
+      categories: body.categories,
     });
 
     collection.save((error, savedCollection) => {
       if (error) {
-        res.status(400).json({ ok: false, error});
+        res.status(400).json({ ok: false, error });
       } else {
         const supply = body.collectionSupply;
         for (let i = 0; i < supply; i++) {
@@ -59,10 +62,8 @@ router.post(
             if (error) {
               return res.status(400).json({ ok: false, error });
             } else {
-               
             }
-            
-          });  
+          });
         }
         res.status(201).json({ ok: true, savedCollection, body });
       }
@@ -73,46 +74,50 @@ router.post(
 // Query a todas las colecciones
 router.get("/", (req, res) => {
   Collection.find({}, (err, collection) => {
-      if (err) {
-          res.status(400).json({ok: false, err})
-      } else {
-            User.populate(
-            collection,
-            { path: 'author' , select: ["username", "email", "avatar"]},
-            (err, collection) => {
-                if (err) {
-                res.status(400).json({ ok: false, err });
-                } else {
-                res.status(200).json({ ok: true, collection });
-                }
-            }
-            );
-}})
-})
-
-//Query a una colección discriminando categorías. 
-router.post("/filter", (req, res) => {
-    let body = req.body; 
-
-    Collection.find({categories: {$in: [body.map(category => ( category.value))]}}, (err, collections) => {
-        if (err) {
-            res.status(400).json({ok: false, err});
-        } else {
-            User.populate(
-                collections,
-                { path: 'author' , select: ["username", "email", "avatar"]},
-                (err, collections) => {
-                    if (err) {
-                    res.status(400).json({ ok: false, err });
-                    } else {
-                    res.status(200).json({ ok: true, collections });
-                    }
-                }
-                );  
+    if (err) {
+      res.status(400).json({ ok: false, err });
+    } else {
+      User.populate(
+        collection,
+        { path: "author", select: ["username", "email", "avatar"] },
+        (err, collection) => {
+          if (err) {
+            res.status(400).json({ ok: false, err });
+          } else {
+            res.status(200).json({ ok: true, collection });
+          }
         }
-    })
+      );
+    }
+  });
+});
 
-})
+//Query a una colección discriminando categorías.
+router.post("/filter", (req, res) => {
+     let body = req.body;
+    console.log(body);
+ +
+    Collection.find(
+      { categories: { $in: body.map((category) => category.value) } },
+      (err, collections) => {
+        if (err) {
+          res.status(400).json({ ok: false, err });
+        } else {
+          User.populate(
+            collections,
+            { path: "author", select: ["username", "email", "avatar"] },
+            (err, collections) => {
+              if (err) {
+                res.status(400).json({ ok: false, err });
+              } else {
+                res.status(200).json({ ok: true, collections });
+              }
+            }
+          );
+        }
+      }
+    );
+});
 
 // Query a Una colección
 router.get("/details/:collectionId", (req, res) => {
@@ -122,41 +127,23 @@ router.get("/details/:collectionId", (req, res) => {
     if (err) {
       res.status(400).json({ ok: false, err, message: "collection not found" });
     } else {
-        {
-            User.populate(
-            collection,
-            { path: 'author' , select: ["username", "email", "avatar"]},
-            (err, collection) => {
-                if (err) {
-                res.status(400).json({ ok: false, err });
-                } else {
-                res.status(200).json({ ok: true, collection });
-                }
+      {
+        User.populate(
+          collection,
+          { path: "author", select: ["username", "email", "avatar"] },
+          (err, collection) => {
+            if (err) {
+              res.status(400).json({ ok: false, err });
+            } else {
+              res.status(200).json({ ok: true, collection });
             }
-            );
-}
+          }
+        );
+      }
     }
   });
 });
 
-
-
-// Query a todos los productos.
-router.get("/products", (req, res) => {
-  Product.find({}, (err, products) => {
-    Collection.populate(
-      products,
-      { path: "parentCollection" },
-      (err, products) => {
-        if (err) {
-          res.status(400).json({ ok: false, err });
-        } else {
-          res.status(200).json({ ok: true, products });
-        }
-      }
-    );
-  });
-});
 
 router.delete("/", (req, res) => {
   res.json({ answer: "hola" });

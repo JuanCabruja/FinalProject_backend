@@ -39,7 +39,7 @@ let collectionSchema = new Schema({
     author: {
         type: Schema.ObjectId, ref: "User",
         required: [true, "an author is needed"]
-    },
+    }, 
     categories: [{type: Schema.ObjectId, ref: "category"}] 
 });
 

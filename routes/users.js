@@ -1,5 +1,6 @@
 const ramda = require("ramda");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const express = require("express");
@@ -11,7 +12,10 @@ const User = require("../models/user");
 
 const upload = require("../libs/storage");
 
-const { verifyToken, verifyAdmin } = require("../middlewares/auth");
+const { verifyToken, verifyAdmin } = require("../middlewares/auth")
+
+
+
 
 router.get("/", async (req, res) => {
   // Similar al find de Mongo. Si el filtro está vacío,
@@ -125,7 +129,9 @@ router.get("/creators", async (req, res) => {
 });
 
 // Request de info usuario y pobla el campo objetos.
+
 // TODO: Aquí puedo poner una discriminación que si el usuario es creador le envíe solo las colecciones y cuantas están disponibles
+
 router.get("/:username", async (req, res) => {
   let usernameRaw = req.params.username;
   let username = usernameRaw.toLowerCase();
@@ -176,21 +182,13 @@ router.put(
   verifyToken,
   upload.single("avatar"),
   (req, res) => {
+    
     let usernameRaw = req.params.username;
     let username = usernameRaw.toLowerCase();
     let body = req.body;
 
     const url = req.protocol + "://" + req.get("host");
     const file = url + "/public/" + req.file.filename;
-
-    // const file = req.file
-    // if (!file) {
-    //   const error = new Error('Please upload a file')
-    //   error.httpStatusCode = 400
-    //   return next(error)
-    // }
-    //   res.send(file)
-
     const filter = { _id: body._id };
 
     User.updateOne(filter, { avatar: file }, (err, user) => {
@@ -203,44 +201,30 @@ router.put(
   }
 );
 
+// TODO: Este primer bloque de código no lo estoy usando
 // Modificación de los valores del usuario
-router.put("/:username/config", verifyToken, (req, res) => {
-  let usernameRaw = req.params.username;
-  let username = usernameRaw.toLowerCase();
+    router.put("/:username/config", verifyToken, (req, res) => {
+      let usernameRaw = req.params.username;
+      let username = usernameRaw.toLowerCase();
 
-  let body = req.body;
-  let newUsername = body.username.toLowerCase();
+      let body = req.body;
+      let newUsername = body.username.toLowerCase();
 
-  //Supongo que esto tendré que hacerlo para todos los valores de los usuarios
-  //TODO: Preguntarle a Jesús alguna posible forma de hacer un código mas limpio y genérico
-
-  // User.findOneAndReplace({username: username},
-  //     {username: newUsername,
-  //     email: body.email,
-  //     password:  bcrypt.hashSync(body.password, 10),
-  //     }, (err, user) => {
-  //     if (err) {
-  //         res.status(400).json({ok: false, err});
-  //     } else {
-  //         res.status(200).json({ok: true, user});
-  //     }
-  // })
-
-  User.updateOne(
-    { username: username },
-    {
-      username: newUsername,
-      email: body.email,
-      password: bcrypt.hashSync(body.password, 10),
-    },
-    (err, user) => {
-      if (err) {
-        res.status(400).json({ ok: false, err });
-      } else {
-        res.status(200).json({ ok: true, user });
-      }
-    }
-  );
+      User.updateOne(
+        { username: username },
+        {
+          username: newUsername,
+          email: body.email,
+          password: bcrypt.hashSync(body.password, 10),
+        },
+        (err, user) => {
+          if (err) {
+            res.status(400).json({ ok: false, err });
+          } else {
+            res.status(200).json({ ok: true, user });
+          }
+        }
+      );
 });
 
 // User username & description update. 
@@ -290,6 +274,22 @@ router.put("/:username/updateEmail", verifyToken, (req, res) => {
     );
   });
 
+// User password update. 
+router.put("/:username/updatePassword", verifyToken, (req, res) => {
+  let body = req.body; 
+  const newPassword = body.newPassword;
+  const id = body.id; 
+
+  const filter = {_id: id}
+
+  User.updateOne(filter, {password: bcrypt.hashSync(body.newPassword, 10)}, (err, user) => {
+    if (err) {
+      res.status(400).json({ok: false, err});
+    } else {
+      res.status(200).json({ok: true, user})
+    }
+  })
+})
 
 router.delete("/:username/delete", verifyToken, (req, res) => {
   let usernameRaw = req.params.username;
@@ -303,5 +303,8 @@ router.delete("/:username/delete", verifyToken, (req, res) => {
     }
   });
 });
+
+
+
 
 module.exports = router;

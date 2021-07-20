@@ -15,9 +15,14 @@ const {verifyToken} = require("../middlewares/auth");
 
 
 
-// Esto irá asumo después del procesado del pago. 
-// Aunque también podría ser que esto sea un fetch a la iniciación del proceso de compra y venta. 
-//TODO: Terminar de gestionar este concepto de TODOs
+// Una vez se confirme el proceso de pago se ejecuta este documento que registra la transacción
+// Y modifica base de datos del producto. 
+// Por el momento y a efectos de la presentación la orden se ejecuta completándose la transacción.
+
+
+// La idea es que una vez se inicia la transacción el usuario pueda validar desde su cuenta que ha recibido la prenda
+// Una serie de estados para el producto. PENDING, DONE que dependiendo del valor actual de la prenda
+// Si ha empezado la ejecución, una vez se cumpla el estado se procede a comprar.
 
 router.post('/collections/:collectionId', verifyToken, (req, res) => {
 
@@ -40,7 +45,7 @@ router.post('/collections/:collectionId', verifyToken, (req, res) => {
                 product_Id: product._id, 
                 sale_price: price, 
                 date: Date.now(),
-                state: "PENDING", 
+                state: "COMPLETED", 
             })
             order.save((err, savedOrder) => {
                 if (err) {
@@ -68,9 +73,4 @@ router.post('/collections/:collectionId', verifyToken, (req, res) => {
 
 module.exports = router;
 
-// TODO: Gestionando aquí toda la lógica, una vez el consumidor reciba el producto puede marcar que lo ha recibido
-// asumo que para ello tendré que depurar de cierta forma o establecer algún modelo relacional. 
-// Tu podrías
 
-// Una serie de estados para el producto. PENDING, DONE que dependiendo del valor actual de la prenda
-// Si ha empezado la ejecución, una vez se cumpla el estado se procede a comprar.

@@ -19,11 +19,8 @@ router.post(
   verifyCreator,
   upload.array("collectionImages", 10),
   (req, res) => {
-    // Tomando los datos básicos.
+    
     let body = req.body;
-
-    //TODO: El Front está bastante avanzado, me falta revisar los diseños responsive
-    //Limpiar código etc, PERO TENGO QUE HACER LAS GESTIONES DE SEGURIDAD DE LA PÁGINA
 
     // Codigo que almacena las direcciones de las imágenes en un array
     const collectionFiles = [];

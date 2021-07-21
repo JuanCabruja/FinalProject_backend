@@ -13,9 +13,6 @@ app.use(require("./routes"));
 
 app.use('/public', express.static('public'));
 
-//TODO: Dejo aquí esto
-app.set('etag', false)
-
 mongoose.connect("mongodb://localhost:27017/SAFFO", {
     useNewUrlParser: true,
     useUnifiedTopology: true,

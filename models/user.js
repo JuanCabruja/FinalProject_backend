@@ -52,7 +52,7 @@ let userSchema = new Schema({
         enum: validRoles
     },
     paymentMethods: {
-        // TODO: DUDA, ¿COMO ORGANIZO PARA GUARDAR UNA TARJETA?
+        // TODO: A futuro implementar esto
     },
     userInfo: { 
         type: userInfoSchema 
